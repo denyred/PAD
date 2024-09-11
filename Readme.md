@@ -120,11 +120,12 @@ message UserProfile {
 
 ```
 
-##Deployment and Scaling
-###Deployment
+## Deployment and Scaling
+
+### Deployment
 
 Both the Core Appointment Management Service (gRPC) and the Real-time Communication Service (WebSockets) will be containerized using Docker. Each service runs in a separate Docker container to maintain isolation, ensuring smooth development and deployment processes.
 
-###Scaling
+### Scaling
 
 Both microservices will be horizontally scaled using Kubernetes, ensuring the platform can handle traffic spikes efficiently.
