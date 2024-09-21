@@ -134,6 +134,12 @@ message AppointmentsResponse {
 
 ## WebSocket API Definitions
 
+```proto
+/websocket/barber/{barber_id}/appointments
+/websocket/client/{client_id}/appointments
+/websocket/appointment/{appointment_id}/chat
+```
+
 ```json
 {
   "type": "appointment_confirmation",
