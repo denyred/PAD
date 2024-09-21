@@ -183,4 +183,4 @@ Both the Core Appointment Management Service (gRPC) and the Real-time Communicat
 
 ### Scaling
 
-Both microservices will be horizontally scaled using Kubernetes, ensuring the platform can handle traffic spikes efficiently.
+Both microservices will be horizontally scaled using Kubernetes, ensuring the platform can handle traffic spikes efficiently..
