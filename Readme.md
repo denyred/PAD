@@ -39,7 +39,7 @@ While a single monolithic application could handle everything, dividing the plat
     - Provides live updates for appointment status (e.g., confirmations, cancellations).
     - Sends instant notifications for last-minute changes (e.g., schedule updates).
 - **Technology Stack**:
-    - **Backend**: C# (ASP.NET Core with WebSocket support)
+    - **Backend**: Python (with WebSocket support)
     - **Cache**: Redis (for storing live WebSocket session data)
     - **Messaging**: RabbitMQ (for asynchronous messaging between services)
 - **Communication**: WebSocket connections are used for delivering real-time updates and messages between the platform and users.
@@ -49,11 +49,18 @@ While a single monolithic application could handle everything, dividing the plat
 ## gRPC API Definitions
 
 ### User Management
+
 ```proto
 service UserService {
     rpc SignUp(SignUpRequest) returns (SignUpResponse);
     rpc Login(LoginRequest) returns (LoginResponse);
     rpc GetUserProfile(GetUserProfileRequest) returns (UserProfile);
+
+    // Appointment-related RPCs
+    rpc CreateAppointment(CreateAppointmentRequest) returns (AppointmentResponse);
+    rpc ModifyAppointment(ModifyAppointmentRequest) returns (AppointmentResponse);
+    rpc CancelAppointment(CancelAppointmentRequest) returns (AppointmentResponse);
+    rpc GetAppointments(GetAppointmentsRequest) returns (AppointmentsResponse);
 }
 
 message SignUpRequest {
@@ -84,39 +91,87 @@ message GetUserProfileRequest {
 message UserProfile {
     string username = 1;
     string email = 2;
-    repeated string appointments = 3;
+    repeated Appointment appointments = 3;  // Added appointments field
+}
+
+message Appointment {
+    string appointment_id = 1;
+    string date_time = 2;
+    string barber_name = 3;
+    string status = 4;  // e.g., confirmed, canceled, etc.
+}
+
+// Appointment-related messages
+
+message CreateAppointmentRequest {
+    string user_id = 1;
+    string date_time = 2;
+    string barber_name = 3;
+}
+
+message ModifyAppointmentRequest {
+    string appointment_id = 1;
+    string date_time = 2;
+}
+
+message CancelAppointmentRequest {
+    string appointment_id = 1;
+}
+
+message AppointmentResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message GetAppointmentsRequest {
+    string user_id = 1;
+}
+
+message AppointmentsResponse {
+    repeated Appointment appointments = 1;
 }
 ```
 
 ## WebSocket API Definitions
 
 ```json
-
 {
   "type": "appointment_confirmation",
   "appointment_id": "12345",
+  "barber_id": "barber_001",
+  "client_id": "client_123",
   "status": "confirmed",
+  "appointment_date_time": "2024-09-25T15:00:00",
   "message": "Your appointment is confirmed for 2024-09-25 at 15:00."
 }
 
 {
   "type": "appointment_cancellation",
   "appointment_id": "12345",
+  "barber_id": "barber_001",
+  "client_id": "client_123",
   "status": "canceled",
   "message": "Your appointment has been canceled."
 }
 
 {
   "type": "chat_message",
-  "sender": "Barber A",
+  "appointment_id": "12345",
+  "barber_id": "barber_001",
+  "client_id": "client_123",
+  "sender": "barber",  // could be "barber" or "client" to indicate the message origin
   "message": "Can you come in 10 minutes earlier?"
 }
 
 {
   "type": "notification",
+  "appointment_id": "12345",
+  "client_id": "client_123",
+  "barber_id": "barber_001",
   "message": "Reminder: Your appointment is tomorrow at 15:00",
   "status": "unread"
 }
+
 
 ```
 
